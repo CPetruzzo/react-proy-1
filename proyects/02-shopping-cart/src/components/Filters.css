@@ -1,0 +1,22 @@
+.filters {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  
+  .filters > div {
+    display: flex;
+    place-content: center;
+    gap: 1rem;
+    margin-bottom: 10px;
+  }
+
+  .filters > div label {
+    display: block;
+  }
+
+  .filters:has(.filters-brand-cat)  {
+    display: block;
+  }
