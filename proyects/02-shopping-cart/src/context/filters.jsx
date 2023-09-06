@@ -1,23 +1,28 @@
-import { createContext, useState } from 'react'
+import React, { createContext, useState } from 'react';
 
-// Este es el que tenemos que consumir
-export const FiltersContext = createContext()
+export const FiltersContext = createContext();
 
-// Este es el que nos provee de acceso al contexto
-export function FiltersProvider ({ children }) {
+export function FiltersProvider({ children }) {
   const [filters, setFilters] = useState({
     category: 'all',
     minPrice: 250,
-    brand: 'all' // Agrega un estado para la marca
-  })
+    brand: 'all',
+  });
+
+  // Agrega un estado para la marca
+  const [selectedBrand, setSelectedBrand] = useState('Astrea');
 
   return (
-    <FiltersContext.Provider value={{
-      filters,
-      setFilters
-    }}
+    <FiltersContext.Provider
+      value={{
+        filters,
+        setFilters,
+        // Proporciona el estado y la función para seleccionar la marca
+        selectedBrand,
+        setSelectedBrand,
+      }}
     >
       {children}
     </FiltersContext.Provider>
-  )
+  );
 }
