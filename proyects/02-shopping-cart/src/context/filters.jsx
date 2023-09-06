@@ -10,7 +10,7 @@ export function FiltersProvider({ children }) {
   });
 
   // Agrega un estado para la marca
-  const [selectedBrand, setSelectedBrand] = useState('Astrea');
+  const [selectedBrand, setSelectedBrand] = useState('all');
 
   return (
     <FiltersContext.Provider

@@ -18,6 +18,7 @@ export function Filters() {
   const minPriceFilterId = useId();
   const categoryFilterId = useId();
   const brandFilterId = useId(); // Definir brandFilterId
+  const advancedFilterId = useId();
 
   // Maneja el cambio de filtros y marca seleccionada
   const handleFilterChange = () => {
@@ -27,7 +28,7 @@ export function Filters() {
   };
 
   useEffect(() => {
-    console.log("useEffect is running");
+    // console.log("useEffect is running");
 
     // Escucha cambios en los filtros, la marca seleccionada o la búsqueda
     handleFilterChange();
@@ -50,23 +51,27 @@ export function Filters() {
   const handleChangeBrand = (event) => {
     const brandValue = event.target.value;
     setSelectedBrand(brandValue); // Actualiza la marca seleccionada
+    console.log('brandValue', brandValue)
 
-    // Llama a filterProducts con los productos actuales para obtener la lista filtrada
-    const filtered = filterProducts(initialProducts); // Reemplaza "allProducts" con tu lista de productos real
-    setFilteredProducts(filtered); // Actualiza la lista de productos filtrados
+    // Aquí establece el valor de búsqueda en el contexto de filtros
+    setFilters((prevState) => ({
+      ...prevState,
+      brand: brandValue,
+    }));
   };
 
   const handleSearch = (event) => {
     const query = event.target.value;
     setSearchQuery(query);
     console.log("Search Query:", query);
-
-    // Aquí establece el valor de búsqueda en el contexto de filtros
+  
+    // Actualiza la consulta de búsqueda en el contexto de filtros
     setFilters((prevState) => ({
       ...prevState,
       searchQuery: query,
     }));
   };
+  
   return (
     <section className="filters">
       <div>
@@ -81,13 +86,17 @@ export function Filters() {
         />
         <span>${filters.minPrice}</span>
       </div>
+
+      <label htmlFor={advancedFilterId}>Búsqueda avanzada </label>
       <input
         type="text"
+        id = {advancedFilterId}
         placeholder="Buscar por marca..."
         value={searchQuery}
         onChange={handleSearch}
       />
       <div className="filters-brand-cat">
+
         <label htmlFor={categoryFilterId}>Categoría</label>{" "}
         <select id={categoryFilterId} onChange={handleChangeCategory}>
           <option value="all">Todas</option>
@@ -96,11 +105,12 @@ export function Filters() {
           <option value="home-decoration">HomeDeco</option>
           <option value="books">Books</option>
         </select>
+
         <label htmlFor={brandFilterId}>Marca</label>
         <select
           id={brandFilterId}
           onChange={handleChangeBrand}
-          value={selectedBrand}
+          value={filters.brand}
         >
           <option value="all">Todas</option>
           <option value="Rubinzal">Rubinzal</option>
