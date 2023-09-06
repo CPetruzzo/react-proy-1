@@ -12,7 +12,7 @@ export function Filters() {
     setSelectedBrand,
     filterProducts,
   } = useFilters();
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(""); // Establece inicialmente en vacío
   const [filteredProducts, setFilteredProducts] = useState(initialProducts); // Estado para la lista filtrada de productos
 
   const minPriceFilterId = useId();
@@ -109,11 +109,11 @@ export function Filters() {
         </select>
       </div>
 
-      <div className="filtered-products">
+      {/* <div className="filtered-products">
         {filteredProducts.map((product) => (
           <div key={product.id}>{product.title + " " + product.brand}</div>
         ))}
-      </div>
+      </div> */}
     </section>
   );
 }
