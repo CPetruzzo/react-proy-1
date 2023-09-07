@@ -8,20 +8,14 @@ export function useFilters() {
 
   const filterProducts = (products) => {
     return products.filter((product) => {
-      let lowercaseQuery = searchQuery ? searchQuery.toLowerCase() : ""; // Comprueba si searchQuery no es nulo o undefined
-      // console.log("lowercaseQuery", lowercaseQuery);
-
+      const lowercaseQuery = searchQuery ? searchQuery.toLowerCase() : ""; // Comprueba si searchQuery no es nulo o undefined
       const lowercaseBrand = product.brand ? product.brand.toLowerCase() : ""; // Comprueba si product.brand no es nulo o undefined
-      // console.log("lowercaseBrand", lowercaseBrand);
 
       return (
         product.price >= filters.minPrice &&
-        // searchQuery !== undefined &&
         (filters.category === "all" || product.category === filters.category) &&
         (filters.brand === "all" || product.brand === filters.brand) &&
-        // (selectedBrand === "all" || product.brand === selectedBrand) && // Filtrar por marca si se selecciona una
-        (lowercaseBrand.includes(lowercaseQuery) ||
-          product.title.toLowerCase().includes(lowercaseQuery))
+        (lowercaseBrand.includes(lowercaseQuery) || product.title.toLowerCase().includes(lowercaseQuery))
       );
     });
   };

@@ -3,6 +3,8 @@ import { useFilters } from "../hooks/useFilters.js";
 import "./Filters.css";
 import React, { useState, useEffect } from "react";
 import { products as initialProducts } from "../mocks/products.json";
+import { collection, getDocs } from "@firebase/firestore";
+import { firestore } from "../firebase.js";
 
 export function Filters() {
   const {
@@ -12,27 +14,74 @@ export function Filters() {
     setSelectedBrand,
     filterProducts,
   } = useFilters();
-  const [searchQuery, setSearchQuery] = useState(""); // Establece inicialmente en vacío
-  const [filteredProducts, setFilteredProducts] = useState(initialProducts); // Estado para la lista filtrada de productos
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredProducts, setFilteredProducts] = useState(initialProducts);
+  const [libros, setLibros] = useState([]); // Estado para los libros obtenidos de Firestore
+  const [loaded, setLoaded] = useState(false); // Estado para indicar si los libros ya se han cargado
 
   const minPriceFilterId = useId();
   const categoryFilterId = useId();
-  const brandFilterId = useId(); // Definir brandFilterId
+  const brandFilterId = useId();
   const advancedFilterId = useId();
+
+  const cargarLibrosDesdeFirestore = async () => {
+    try {
+      const libroCollectionRef = collection(firestore, "libro");
+      const querySnapshot = await getDocs(libroCollectionRef);
+
+      const librosData = [];
+
+      querySnapshot.forEach((doc) => {
+        const libroData = doc.data();
+        // Formatea los datos como lo necesitas
+        const formattedLibro = {
+          id: libroData.identificacion,
+          title: libroData.title,
+          description: libroData.description,
+          price: libroData.price,
+          brand: libroData.brand,
+          thumbnail: libroData.thumbnail,
+          category: libroData.category,
+          discountPercentage: libroData.discountPercentage,
+          images: libroData.images,
+          rating: 4.44,
+          stock: 7
+
+          // Agrega otras propiedades aquí
+        };
+        librosData.push(formattedLibro);
+      });
+
+      setLibros(librosData);
+      setLoaded(true); // Marcar que los libros se han cargado
+    } catch (error) {
+      console.error("Error al cargar datos de Firestore:", error);
+    }
+  };
+
+  // Función para cargar los libros desde Firestore al montar el componente
+  useEffect(() => {
+    // Llama a la función para cargar libros solo si aún no se han cargado
+    if (!loaded) {
+      cargarLibrosDesdeFirestore();
+    }
+  }, [loaded]);
 
   // Maneja el cambio de filtros y marca seleccionada
   const handleFilterChange = () => {
-    // Llama a filterProducts con la lista completa de productos
-    const filtered = filterProducts(initialProducts); // Reemplaza "allProducts" con tu lista de productos real
-    setFilteredProducts(filtered); // Actualiza la lista de productos filtrados
+    // Combina los libros cargados desde Firestore con initialProducts
+    const combinedProducts = [...libros, ...initialProducts];
+    // Filtra los productos combinados con los filtros
+    const filtered = filterProducts(combinedProducts);
+    console.log(filtered);
+    setFilteredProducts(filtered);
   };
 
+  // Este useEffect se ejecutará cuando cambien los filtros, la marca seleccionada o la búsqueda
   useEffect(() => {
-    // console.log("useEffect is running");
-
-    // Escucha cambios en los filtros, la marca seleccionada o la búsqueda
     handleFilterChange();
-  }, [filters, selectedBrand, searchQuery]);
+  }, [filters, selectedBrand, searchQuery, libros]);
+
 
   const handleChangeMinPrice = (event) => {
     setFilters((prevState) => ({
@@ -64,14 +113,14 @@ export function Filters() {
     const query = event.target.value;
     setSearchQuery(query);
     console.log("Search Query:", query);
-  
+
     // Actualiza la consulta de búsqueda en el contexto de filtros
     setFilters((prevState) => ({
       ...prevState,
       searchQuery: query,
     }));
   };
-  
+
   return (
     <section className="filters">
       <div>
@@ -90,7 +139,7 @@ export function Filters() {
       <label htmlFor={advancedFilterId}>Búsqueda avanzada </label>
       <input
         type="text"
-        id = {advancedFilterId}
+        id={advancedFilterId}
         placeholder="Buscar por marca..."
         value={searchQuery}
         onChange={handleSearch}
