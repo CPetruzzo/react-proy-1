@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import { firestore } from "../firebase.js";
 import { collection, addDoc } from "@firebase/firestore";
@@ -7,8 +7,9 @@ import { getDocs, deleteDoc } from "@firebase/firestore";
 
 
 export function FileUploader({ onUploadComplete }) {
-  const [uploadedData, setUploadedData] = useState(null);
-
+    const [uploadedData, setUploadedData] = useState(null);
+    const [firestoreData, setFirestoreData] = useState([]);
+  
   const parseExcel = function(file) {
   var reader = new FileReader();
 
@@ -50,6 +51,7 @@ export function FileUploader({ onUploadComplete }) {
       // Borra todos los documentos existentes en la colección antes de añadir los nuevos
       const querySnapshot = await getDocs(librosCollectionRef);
       querySnapshot.forEach(async (doc) => {
+        console.log(doc.data);
         await deleteDoc(doc.ref);
       });
 
@@ -57,10 +59,27 @@ export function FileUploader({ onUploadComplete }) {
       jsonData.forEach(async (libro) => {
         await addDoc(librosCollectionRef, libro);
       });
+
+            // Obtiene los datos de Firestore después de la actualización
+            const updatedData = await fetchFirestoreData(librosCollectionRef);
+            setFirestoreData(updatedData);
     } catch (error) {
       console.error("Error al actualizar Firestore:", error);
     }
   };
+
+  const fetchFirestoreData = async (collectionRef) => {
+    const querySnapshot = await getDocs(collectionRef);
+    const data = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    return data;
+  };
+
+  useEffect(() => {
+    // Carga los datos de Firestore al montar el componente
+    const librosCollectionRef = collection(firestore, "libro");
+    const initialFirestoreData = fetchFirestoreData(librosCollectionRef);
+    setFirestoreData(initialFirestoreData);
+  }, []);
 
   const onDrop = async (acceptedFiles) => {
     const xlsFile = acceptedFiles[0];
@@ -76,15 +95,26 @@ export function FileUploader({ onUploadComplete }) {
   const { getRootProps, getInputProps } = useDropzone({ onDrop });
 
   return (
-    <div {...getRootProps()} className="file-uploader">
-      <input {...getInputProps()} />
-      <p>Arrastra y suelta un archivo aquí o haz clic para seleccionar uno.</p>
-      {uploadedData && (
-        <div>
-          <h4>Datos subidos:</h4>
-          <pre>{JSON.stringify(uploadedData, null, 2)}</pre>
-        </div>
-      )}
+    <div>
+      <div {...getRootProps()} className="file-uploader">
+        <input {...getInputProps()} />
+        <p>Arrastra y suelta un archivo aquí o haz clic para seleccionar uno.</p>
+        {uploadedData && (
+          <div>
+            <h4>Datos subidos:</h4>
+            <pre>{JSON.stringify(uploadedData, null, 2)}</pre>
+          </div>
+        )}
+      </div>
+
+      {/* <div> */}
+        {/* <h4>Datos en Firestore:</h4> */}
+        {/* <pre>{JSON.stringify(firestoreData, null, 2)}</pre> */}
+      {/* </div> */}
     </div>
   );
 }
+
+
+
+

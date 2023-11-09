@@ -15,6 +15,7 @@ import { FileUploader } from "./components/FileUploader.jsx"; // Importa el nuev
 export default function App() {
   const { filterProducts } = useFilters();
   const [libros, setLibros] = useState([]); // Estado para los libros obtenidos de Firestore
+  console.log(libros);
 
   // Función para cargar los libros desde Firestore
   const cargarLibrosDesdeFirestore = async () => {
@@ -26,22 +27,29 @@ export default function App() {
 
       querySnapshot.forEach((doc) => {
         const libroData = doc.data();
+        console.log(doc.data());
+
+        // console.log(libroData);
         // Formatea los datos como lo necesitas
         const formattedLibro = {
           id: libroData.identificacion,
           title: libroData.title,
           description: libroData.description,
           price: libroData.price,
+          autor: libroData.autor,
           brand: libroData.brand,
           thumbnail: libroData.thumbnail,
           category: libroData.category,
           discountPercentage: libroData.discountPercentage,
           images: libroData.images,
           rating: 4.44,
-          stock: 7
+          stock: 7,
+          
           // Agrega otras propiedades aquí
         };
+        // console.log(formattedLibro.description);
         librosData.push(formattedLibro);
+        // console.log(formattedLibro);
       });
 
       return librosData;
@@ -55,6 +63,7 @@ export default function App() {
     // Llama a cargarLibrosDesdeFirestore para obtener los libros de Firestore
     const cargarLibros = async () => {
       const librosData = await cargarLibrosDesdeFirestore();
+      console.log(librosData);
       setLibros(librosData);
     };
 
@@ -66,6 +75,7 @@ export default function App() {
 
   // Obtén los productos filtrados
   const filteredProducts = filterProducts(combinedProducts);
+  console.log("Filtered Products:", filteredProducts);
 
   const handleUploadComplete = (uploadedData) => {
     // Maneja el final de la carga aquí si es necesario

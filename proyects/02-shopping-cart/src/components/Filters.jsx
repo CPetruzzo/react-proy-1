@@ -33,6 +33,7 @@ export function Filters() {
 
       querySnapshot.forEach((doc) => {
         const libroData = doc.data();
+
         // Formatea los datos como lo necesitas
         const formattedLibro = {
           id: libroData.identificacion,
@@ -50,9 +51,11 @@ export function Filters() {
           // Agrega otras propiedades aquí
         };
         librosData.push(formattedLibro);
+        // console.log(formattedLibro)
       });
 
       setLibros(librosData);
+      console.log(librosData)
       setLoaded(true); // Marcar que los libros se han cargado
     } catch (error) {
       console.error("Error al cargar datos de Firestore:", error);
@@ -67,15 +70,19 @@ export function Filters() {
     }
   }, [loaded]);
 
-  // Maneja el cambio de filtros y marca seleccionada
-  const handleFilterChange = () => {
-    // Combina los libros cargados desde Firestore con initialProducts
-    const combinedProducts = [...libros, ...initialProducts];
-    // Filtra los productos combinados con los filtros
-    const filtered = filterProducts(combinedProducts);
-    console.log(filtered);
-    setFilteredProducts(filtered);
-  };
+ // Maneja el cambio de filtros y marca seleccionada
+const handleFilterChange = () => {
+  // Combina los libros cargados desde Firestore con initialProducts
+  const combinedProducts = [...libros, ...initialProducts];
+  console.log("Combined Products:", combinedProducts);
+
+  // Filtra los productos combinados con los filtros
+  const filtered = filterProducts(combinedProducts);
+  console.log("Filtered Products:", filtered);
+
+  setFilteredProducts(filtered);
+};
+
 
   // Este useEffect se ejecutará cuando cambien los filtros, la marca seleccionada o la búsqueda
   useEffect(() => {
@@ -164,15 +171,10 @@ export function Filters() {
           <option value="all">Todas</option>
           <option value="Rubinzal">Rubinzal</option>
           <option value="Astrea">Astrea</option>
+          <option value="Editorial Libreria Civica">Editorial Libreria Civica</option>
           {/* Agrega opciones de marca según tu necesidad */}
         </select>
       </div>
-
-      {/* <div className="filtered-products">
-        {filteredProducts.map((product) => (
-          <div key={product.id}>{product.title + " " + product.brand}</div>
-        ))}
-      </div> */}
     </section>
   );
 }

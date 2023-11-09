@@ -8,18 +8,32 @@ export function useFilters() {
 
   const filterProducts = (products) => {
     return products.filter((product) => {
-      const lowercaseQuery = searchQuery ? searchQuery.toLowerCase() : ""; // Comprueba si searchQuery no es nulo o undefined
-      const lowercaseBrand = product.brand ? product.brand.toLowerCase() : ""; // Comprueba si product.brand no es nulo o undefined
+      const lowercaseQuery = searchQuery ? searchQuery.toLowerCase() : "";
+      const lowercaseBrand = product.brand ? product.brand.toLowerCase() : "";
+  
+      // Si el producto es de Firestore
+      if (product.id) {
+        console.log("tiene id")
+        return (
+          product.price >= filters.minPrice &&
+          (filters.category === "all" || product.category === filters.category) &&
+          (filters.brand === "all" || product.brand === filters.brand) &&
+          (lowercaseBrand.includes(lowercaseQuery) || product.title.toLowerCase().includes(lowercaseQuery))
+        );
+      } else {
+        console.log("tiene viene de manera local")
 
-      return (
-        product.price >= filters.minPrice &&
-        (filters.category === "all" || product.category === filters.category) &&
-        (filters.brand === "all" || product.brand === filters.brand) &&
-        (lowercaseBrand.includes(lowercaseQuery) || product.title.toLowerCase().includes(lowercaseQuery))
-      );
+        // Si el producto es del conjunto inicial
+        return (
+          product.price >= filters.minPrice &&
+          (filters.category === "all" || product.category === filters.category) &&
+          (filters.brand === "all" || product.brand === filters.brand) &&
+          (lowercaseBrand.includes(lowercaseQuery) || product.title.toLowerCase().includes(lowercaseQuery))
+        );
+      }
     });
   };
-
+  
   return {
     filters,
     filterProducts,
