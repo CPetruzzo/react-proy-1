@@ -10,6 +10,7 @@ import { CartProvider } from "./context/cart.jsx";
 import { firestore } from "./firebase.js";
 import { products as initialProducts } from "../src/mocks/products.json";
 import { collection, getDocs } from "@firebase/firestore";
+import { FileUploader } from "./components/FileUploader.jsx"; // Importa el nuevo componente
 
 export default function App() {
   const { filterProducts } = useFilters();
@@ -66,10 +67,16 @@ export default function App() {
   // Obtén los productos filtrados
   const filteredProducts = filterProducts(combinedProducts);
 
+  const handleUploadComplete = (uploadedData) => {
+    // Maneja el final de la carga aquí si es necesario
+    console.log("Carga completa. Datos subidos:", uploadedData);
+  };
+
   return (
     <CartProvider>
       <Header />
       <Cart />
+      <FileUploader onUploadComplete={handleUploadComplete} />
       <Products products={filteredProducts} />
       {IS_DEVELOPMENT && <Footer />}
     </CartProvider>
