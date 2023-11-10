@@ -44,6 +44,7 @@ export default function App() {
           images: libroData.images,
           rating: 4.44,
           stock: 7,
+          indice: libroData.indice
           
           // Agrega otras propiedades aquí
         };
@@ -71,7 +72,9 @@ export default function App() {
   }, []);
 
   // Combina los libros de Firestore con initialProducts
-  const combinedProducts = [...libros, ...initialProducts];
+  const combinedProducts = [...libros, 
+    // ...initialProducts
+  ];
 
   // Obtén los productos filtrados
   const filteredProducts = filterProducts(combinedProducts);

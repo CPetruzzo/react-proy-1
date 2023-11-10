@@ -4,47 +4,55 @@ import { firestore } from "../firebase.js";
 import { collection, addDoc } from "@firebase/firestore";
 import * as XLSX from "xlsx";
 import { getDocs, deleteDoc } from "@firebase/firestore";
-
+import { useFirestoreData } from "../context/firestoreDataContext.jsx";
 
 export function FileUploader({ onUploadComplete }) {
-    const [uploadedData, setUploadedData] = useState(null);
-    const [firestoreData, setFirestoreData] = useState([]);
-  
-  const parseExcel = function(file) {
-  var reader = new FileReader();
+  const [uploadedData, setUploadedData] = useState([]);
+  const [firestoreData, setFirestoreData] = useState([]);
 
-  reader.onload = function(e) {
-    var data = e.target.result;
-    var workbook = XLSX.read(data, {
-      type: 'binary'
-    });
+  const parseExcel = function (file) {
+    var reader = new FileReader();
 
-    workbook.SheetNames.forEach(async function(sheetName) {
-      const headers = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { header: 1 })[0];
+    reader.onload = function (e) {
+      var data = e.target.result;
+      var workbook = XLSX.read(data, {
+        type: "binary",
+      });
 
-      var XL_row_object = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
-      var json_object = JSON.stringify(XL_row_object);
-      console.log(json_object);
+      workbook.SheetNames.forEach(async function (sheetName) {
+        const headers = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {
+          header: 1,
+        })[0];
 
-      // Filtra las filas que tengan todas las celdas vacías
-      const jsonData = XL_row_object.filter(row => Object.values(row).some(cell => cell !== undefined && typeof cell !== "object"));
+        var XL_row_object = XLSX.utils.sheet_to_json(
+          workbook.Sheets[sheetName]
+        );
+        var json_object = JSON.stringify(XL_row_object);
+        console.log(json_object);
 
-      setUploadedData(jsonData);
-      onUploadComplete(jsonData);
+        // Filtra las filas que tengan todas las celdas vacías
+        const jsonData = XL_row_object.filter((row) =>
+          Object.values(row).some(
+            (cell) => cell !== undefined && typeof cell !== "object"
+          )
+        );
 
-      // Actualiza Firestore con los nuevos datos
-      await updateFirestore(jsonData);
-    });
+        setUploadedData(jsonData);
+        onUploadComplete(jsonData);
+
+        // Actualiza Firestore con los nuevos datos
+        await updateFirestore(jsonData);
+      });
+    };
+
+    reader.onerror = function (ex) {
+      console.log(ex);
+    };
+
+    reader.readAsBinaryString(file);
   };
 
-  reader.onerror = function(ex) {
-    console.log(ex);
-  };
-
-  reader.readAsBinaryString(file);
-};
-
-  const updateFirestore = async (jsonData) => {
+  const updateFirestore = async (newData) => {
     try {
       const librosCollectionRef = collection(firestore, "libro");
 
@@ -56,13 +64,13 @@ export function FileUploader({ onUploadComplete }) {
       });
 
       // Añade los nuevos documentos a Firestore
-      jsonData.forEach(async (libro) => {
+      newData.forEach(async (libro) => {
         await addDoc(librosCollectionRef, libro);
       });
 
-            // Obtiene los datos de Firestore después de la actualización
-            const updatedData = await fetchFirestoreData(librosCollectionRef);
-            setFirestoreData(updatedData);
+      // Obtiene los datos de Firestore después de la actualización
+      const updatedData = await fetchFirestoreData(librosCollectionRef);
+      setFirestoreData(updatedData);
     } catch (error) {
       console.error("Error al actualizar Firestore:", error);
     }
@@ -70,7 +78,10 @@ export function FileUploader({ onUploadComplete }) {
 
   const fetchFirestoreData = async (collectionRef) => {
     const querySnapshot = await getDocs(collectionRef);
-    const data = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    const data = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
     return data;
   };
 
@@ -98,15 +109,17 @@ export function FileUploader({ onUploadComplete }) {
     <div>
       <div {...getRootProps()} className="file-uploader">
         <input {...getInputProps()} />
-        <p>Arrastra y suelta un archivo aquí o haz clic para seleccionar uno.</p>
+        <p>
+          Arrastra y suelta un archivo aquí o haz clic para seleccionar uno.
+        </p>
         {uploadedData && (
           <div>
-            <h4>Datos subidos:</h4>
-            <pre>{JSON.stringify(uploadedData, null, 2)}</pre>
+            {/* <h4>Datos subidos:</h4>
+            <pre>{JSON.stringify(uploadedData, null, 2)}</pre> */}
           </div>
         )}
       </div>
-
+      
       {/* <div> */}
         {/* <h4>Datos en Firestore:</h4> */}
         {/* <pre>{JSON.stringify(firestoreData, null, 2)}</pre> */}
@@ -115,6 +128,4 @@ export function FileUploader({ onUploadComplete }) {
   );
 }
 
-
-
-
+// export { firestoreData as default };

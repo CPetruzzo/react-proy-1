@@ -136,7 +136,7 @@ const handleFilterChange = () => {
           type="range"
           id={minPriceFilterId}
           min="0"
-          max="1000"
+          max="10000"
           onChange={handleChangeMinPrice}
           value={filters.minPrice}
         />
