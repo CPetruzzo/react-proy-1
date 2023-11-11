@@ -40,14 +40,17 @@ export function Filters() {
           title: libroData.title,
           description: libroData.description,
           price: libroData.price,
+          autor: libroData.autor,
           brand: libroData.brand,
           thumbnail: libroData.thumbnail,
           category: libroData.category,
           discountPercentage: libroData.discountPercentage,
           images: libroData.images,
           rating: 4.44,
-          stock: 7
-
+          stock: 7,
+          indice: libroData.indice,
+          pagina: libroData.paginas,
+          edicion: libroData.edicion,
           // Agrega otras propiedades aquí
         };
         librosData.push(formattedLibro);
@@ -55,7 +58,7 @@ export function Filters() {
       });
 
       setLibros(librosData);
-      console.log(librosData)
+      // console.log(librosData)
       setLoaded(true); // Marcar que los libros se han cargado
     } catch (error) {
       console.error("Error al cargar datos de Firestore:", error);
@@ -74,11 +77,11 @@ export function Filters() {
 const handleFilterChange = () => {
   // Combina los libros cargados desde Firestore con initialProducts
   const combinedProducts = [...libros, ...initialProducts];
-  console.log("Combined Products:", combinedProducts);
+  // console.log("Combined Products:", combinedProducts);
 
   // Filtra los productos combinados con los filtros
   const filtered = filterProducts(combinedProducts);
-  console.log("Filtered Products:", filtered);
+  // console.log("Filtered Products:", filtered);
 
   setFilteredProducts(filtered);
 };

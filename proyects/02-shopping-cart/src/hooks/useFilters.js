@@ -13,7 +13,7 @@ export function useFilters() {
   
       // Si el producto es de Firestore
       if (product.id) {
-        console.log("tiene id")
+        // console.log("tiene id")
         return (
           product.price >= filters.minPrice &&
           (filters.category === "all" || product.category === filters.category) &&
@@ -21,7 +21,7 @@ export function useFilters() {
           (lowercaseBrand.includes(lowercaseQuery) || product.title.toLowerCase().includes(lowercaseQuery))
         );
       } else {
-        console.log("tiene viene de manera local")
+        // console.log("tiene viene de manera local")
 
         // Si el producto es del conjunto inicial
         return (
